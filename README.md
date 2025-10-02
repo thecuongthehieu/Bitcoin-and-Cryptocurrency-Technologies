@@ -1,4 +1,7 @@
 # Bitcoin and Cryptocurrency Technologies
+
+https://www.coursera.org/learn/cryptocurrency/home/welcome
+
 About this Course
 To really understand what is special about Bitcoin, we need to understand how it works at a technical level. We’ll address the important questions about Bitcoin, such as:
 
