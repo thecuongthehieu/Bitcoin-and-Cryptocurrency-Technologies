@@ -4,10 +4,7 @@
 // test your nodes. You will want to try creating some deviant nodes and
 // mixing them in the network to fully test.
 
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
-import java.util.HashMap;
+import java.util.*;
 
 public class Simulation {
 
@@ -112,17 +109,21 @@ public class Simulation {
       }
 
       // print results
+      Map<Set<Transaction>, Integer> consensusSetFreqMap = new HashMap<>();
+
       for (int i = 0; i < numNodes; i++) {
          Set<Transaction> transactions = nodes[i].sendToFollowers();
-         System.out.println("Transaction ids that Node " + i + " believes consensus on:");
-         for (Transaction tx : transactions)
-            System.out.println(tx.id);
-         System.out.println();
-         System.out.println();
+          consensusSetFreqMap.put(transactions, consensusSetFreqMap.getOrDefault(transactions, 0) + 1);
+
+//         System.out.println("Transaction ids that Node " + i + " believes consensus on:");
+//         for (Transaction tx : transactions)
+//            System.out.println(tx.id);
+//         System.out.println();
+//         System.out.println();
       }
 
+      System.out.println(consensusSetFreqMap.size());
+//      System.out.println(consensusSetFreqMap);
    }
-
-
 }
 
