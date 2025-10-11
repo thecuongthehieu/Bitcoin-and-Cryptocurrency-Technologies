@@ -29,6 +29,7 @@ public class BlockChain {
     }
 
     private final Map<ByteArrayWrapper, Node> nodeMap;
+    private Node maxHeightNode;
     private final TransactionPool transactionPool;
 
     /**
@@ -58,32 +59,20 @@ public class BlockChain {
             }
         }
 
+        this.maxHeightNode = null;
         this.addNewNode(genesisBlock, utxoPool, null);
     }
 
     /** Get the maximum height block */
     public Block getMaxHeightBlock() {
         // IMPLEMENT THIS
-        Node maxHeightNode = this.getMaxHeightNode();
-        return maxHeightNode == null ? null : maxHeightNode.block;
+        return this.maxHeightNode == null ? null : maxHeightNode.block;
     }
 
     /** Get the UTXOPool for mining a new block on top of max height block */
     public UTXOPool getMaxHeightUTXOPool() {
         // IMPLEMENT THIS
-        Node maxHeightNode = this.getMaxHeightNode();
-        return maxHeightNode == null ? null : maxHeightNode.utxoPool;
-    }
-
-    private Node getMaxHeightNode() {
-        Node maxHeighNode = null;
-        for (Node node : this.nodeMap.values()) {
-            if (maxHeighNode == null || maxHeighNode.height < node.height || (maxHeighNode.height == node.height && maxHeighNode.ts.isAfter(node.ts))) {
-                maxHeighNode = node;
-            }
-        }
-
-        return maxHeighNode;
+        return this.maxHeightNode == null ? null : maxHeightNode.utxoPool;
     }
 
     /** Get the transaction pool to mine a new block */
@@ -114,11 +103,10 @@ public class BlockChain {
 
         // Verify prevBlockHash
         Node parentNode = null;
-        int maxHeight = 0;
         for (Node node : this.nodeMap.values()) {
-            maxHeight = Math.max(maxHeight, node.height);
             if (new ByteArrayWrapper(block.getPrevBlockHash()).equals(new ByteArrayWrapper(node.block.getHash()))) {
                 parentNode = node;
+                break;
             }
         }
         if (parentNode == null) {
@@ -126,7 +114,7 @@ public class BlockChain {
         }
 
         // Verify height condition
-        if (maxHeight > parentNode.height + CUT_OFF_AGE) {
+        if (this.maxHeightNode.height > parentNode.height + CUT_OFF_AGE) {
             return false;
         }
 
@@ -167,6 +155,12 @@ public class BlockChain {
         }
 
         this.nodeMap.put(new ByteArrayWrapper(block.getHash()), newNode);
+
+        // Update maxHeightNode
+        // Magically, it should be updated right here!
+        if (this.maxHeightNode == null || this.maxHeightNode.height < newNode.height || (this.maxHeightNode.height == newNode.height && this.maxHeightNode.ts.isAfter(newNode.ts))) {
+            maxHeightNode = newNode;
+        }
     }
 
     /** Add a transaction to the transaction pool */
